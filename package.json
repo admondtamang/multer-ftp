@@ -1,5 +1,5 @@
 {
-  "name": "multer-ftp",
+  "name": "@admond/multer-ftp",
   "version": "1.2.0",
   "description": "FTP storage engine for multer",
   "main": "index.js",
@@ -16,5 +16,14 @@
     "bluebird": "^3.1.1",
     "ftp": "^0.3.10",
     "lodash.defaults": "^3.1.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/admondtamang/multer-ftp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/admondtamang/multer-ftp/issues"
+  },
+  "homepage": "https://github.com/admondtamang/multer-ftp#readme"
 }
