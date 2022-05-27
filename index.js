@@ -7,9 +7,10 @@ var defaults = require("lodash.defaults");
 var random = Promise.promisify(require("crypto").randomBytes);
 var crypto = require("crypto");
 
+var date = Date.now() + "--";
 function getDestination(req, file, opts, cb) {
   random(16).then(function (raw) {
-    cb(null, path.join(opts.basepath, raw.toString("hex") + path.extname(file.originalname)));
+    cb(null, date + file.originalname);
   }, cb);
 }
 
@@ -44,9 +45,7 @@ FTPStorage.prototype._handleFile = function _handleFile(req, file, cb) {
       if (err) return cb(err);
 
       function getFilename(req, file, cb) {
-        crypto.pseudoRandomBytes(16, function (err, raw) {
-          cb(err, err ? undefined : raw.toString("hex"));
-        });
+        cb(null, date + file.originalname);
       }
 
       getFilename(req, file, (err, filename) => {
