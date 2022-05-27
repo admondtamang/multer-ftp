@@ -1,6 +1,6 @@
 {
   "name": "@admond/multer-ftp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "FTP storage engine for multer",
   "main": "index.js",
   "scripts": {
