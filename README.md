@@ -1,4 +1,9 @@
-# multer-ftp
+# @admond/multer-ftp
+
+Changes Features:
+
+1. Avoid file duplication by renaming file with date.
+2. return size and original file name
 
 FTP storage engine for multer.
 
@@ -11,20 +16,20 @@ $ npm install --save multer-ftp
 ## Basic Usage
 
 ```javascript
-var multer = require('multer')
-var FTPStorage = require('multer-ftp')
+var multer = require("multer");
+var FTPStorage = require("multer-ftp");
 
 var upload = multer({
   storage: new FTPStorage({
-    basepath: '/remote/path',
+    basepath: "/remote/path",
     ftp: {
-      host: 'example.com',
+      host: "example.com",
       secure: true, // enables FTPS/FTP with TLS
-      user: 'user',
-      password: 'password'
-    }
-  })
-})
+      user: "user",
+      password: "password",
+    },
+  }),
+});
 ```
 
 For more FTP connection options see [`ftp` module `connect` method](https://github.com/mscdex/node-ftp#methods).
@@ -35,52 +40,56 @@ By default random filenames are chosen (`crypto.randomBytes`), you can change th
 
 ```javascript
 // Demonstrates destination that uses sha1 digest of file
-var multer = require('multer')
-var crypto = require('crypto')
-var FTPStorage = require('multer-ftp')
+var multer = require("multer");
+var crypto = require("crypto");
+var FTPStorage = require("multer-ftp");
 
 var upload = multer({
   storage: new FTPStorage({
     destination: function (req, file, options, callback) {
-      var digest = crypto.createHash('sha1')
+      var digest = crypto.createHash("sha1");
 
-      digest.setEncoding('hex')
+      digest.setEncoding("hex");
 
-      file.stream.pipe(digest)
+      file.stream.pipe(digest);
 
-      file.stream.on('end', function () {
-        digest.end()
-        callback(null, digest.read())
-      })
+      file.stream.on("end", function () {
+        digest.end();
+        callback(null, digest.read());
+      });
     },
-    ftp: { /* ... */ }
-  })
-})
+    ftp: {
+      /* ... */
+    },
+  }),
+});
 ```
 
 ## Advanced usage
 
 ```javascript
-var multer = require('multer')
-var FTPStorage = require('multer-ftp')
-var FTP = require('ftp')
+var multer = require("multer");
+var FTPStorage = require("multer-ftp");
+var FTP = require("ftp");
 
 var upload = multer({
   storage: new FTPStorage({
-    basepath: '/remote/path', // base path for file uploads on the server
-    ftp: { /* ... */ }, // FTP connection options, see `ftp` node module for more
+    basepath: "/remote/path", // base path for file uploads on the server
+    ftp: {
+      /* ... */
+    }, // FTP connection options, see `ftp` node module for more
     connection: new FTP(), // pass existing instance of `ftp`
     destination: function (req, file, options, callback) {
-      callback(null, 'testfilename') // custom file destination, file extension is added to the end of the path
+      callback(null, "testfilename"); // custom file destination, file extension is added to the end of the path
     },
     transformFile: function (req, file, callback) {
       // transform the file before uploading it
       //   file.stream is a ReadableStream of the file
       //   callback(error, < ReadableStream | Buffer | String >)
-      callback(null, file.stream)
-    }
-  })
-})
+      callback(null, file.stream);
+    },
+  }),
+});
 ```
 
 ## Todo
