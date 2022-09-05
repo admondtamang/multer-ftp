@@ -7,8 +7,12 @@ var defaults = require("lodash.defaults");
 var random = Promise.promisify(require("crypto").randomBytes);
 var crypto = require("crypto");
 
-var date = Date.now() + "--";
+var date;
+
 function getDestination(req, file, opts, cb) {
+  date = Date.now() + "--";
+  console.log(date + file.originalname, "File uplod ------", Date.now() + "--");
+
   random(16).then(function (raw) {
     cb(null, date + file.originalname);
   }, cb);
@@ -41,38 +45,43 @@ FTPStorage.prototype._handleFile = function _handleFile(req, file, cb) {
 
   function handleFile(stream) {
     // ftp
-    instance.opts.destination(req, file, instance.opts, function (err, destination) {
-      if (err) return cb(err);
+    instance.opts.destination(
+      req,
+      file,
+      instance.opts,
+      function (err, destination) {
+        if (err) return cb(err);
 
-      function getFilename(req, file, cb) {
-        cb(null, date + file.originalname);
+        function getFilename(req, file, cb) {
+          cb(null, date + file.originalname);
+        }
+
+        getFilename(req, file, (err, filename) => {
+          const destination = os.tmpdir();
+          if (err) return cb(err);
+
+          var finalPath = path.join(destination, filename);
+          var outStream = fs.createWriteStream(finalPath);
+
+          file.stream.pipe(outStream);
+          outStream.on("error", cb);
+          outStream.on("finish", function () {
+            obj = {
+              filename: filename,
+              size: outStream.bytesWritten,
+            };
+          });
+        }); // end of fileName
+
+        instance.ftp.put(stream, destination, function (err) {
+          if (err) return cb(err);
+          cb(null, {
+            path: destination,
+            ...obj,
+          });
+        }); //end of ftp
       }
-
-      getFilename(req, file, (err, filename) => {
-        const destination = os.tmpdir();
-        if (err) return cb(err);
-
-        var finalPath = path.join(destination, filename);
-        var outStream = fs.createWriteStream(finalPath);
-
-        file.stream.pipe(outStream);
-        outStream.on("error", cb);
-        outStream.on("finish", function () {
-          obj = {
-            filename: filename,
-            size: outStream.bytesWritten,
-          };
-        });
-      }); // end of fileName
-
-      instance.ftp.put(stream, destination, function (err) {
-        if (err) return cb(err);
-        cb(null, {
-          path: destination,
-          ...obj,
-        });
-      }); //end of ftp
-    });
+    );
   }
 
   instance.ready.then(function () {
